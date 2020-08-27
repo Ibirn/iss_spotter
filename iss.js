@@ -17,6 +17,27 @@ const fetchMyIP = rqcallback => {
   });
 };
 
+const fetchGeoID = (ip, rqcallback) => {
+
+  request(`https://ipvigilante.com/${ip}`, (error, response, body) => {
+    if(error){
+      rqcallback("Failed to get Geo coordinates: "+ error, null)
+      return;
+    }
+    if (response.statusCode !== 200){
+      rqcallback(`HTTP error ${response.statusCode}. Response: ${body}`)
+      return;
+    }
+
+    const { latitude, longitude } = JSON.parse(body).data;
+
+    rqcallback(null, {latitude, longitude})
+
+  });
+}
+
+
 module.exports = {
-  fetchMyIP
+  fetchMyIP,
+  fetchGeoID
 };

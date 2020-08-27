@@ -1,4 +1,5 @@
-const { fetchMyIP } = require('./iss');
+const { fetchMyIP, fetchGeoID } = require('./iss');
+
 
 fetchMyIP((error, data) => {
   if (error) {
@@ -6,4 +7,13 @@ fetchMyIP((error, data) => {
     return;
   }
   console.log("IP: ", data);
+  
+  fetchGeoID(data, (error2, data2) =>{
+    if(error2){
+      console.log("err: ", error2)
+      return;
+    }
+    console.log("data: ", data2)
+  })
 });
+
