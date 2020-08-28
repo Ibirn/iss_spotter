@@ -39,22 +39,48 @@ const fetchGeoID = (ip, rqcallback) => {
 
 const flyoverTimes = (coordinates, rqcallback) => {
   request(`http://api.open-notify.org/iss-pass.json?lat=${coordinates.latitude}&lon=${coordinates.longitude}`, (error, response, body) => {
-    if (error){
-      rqcallback("Failed to get passover times: " + error, null)
+    if (error) {
+      rqcallback("Failed to get passover times: " + error, null);
       return;
     }
     if (response.statusCode !== 200) {
       rqcallback(`HTTP error ${response.statusCode}. Response: \n${body}`);
       return;
     }
-    const flyovers = JSON.parse(body).response
-    rqcallback(null, flyovers)
-});
-}
+    const flyovers = JSON.parse(body).response;
+    rqcallback(null, flyovers);
+  });
+};
 
+const localTimes = (callback) => {
+  fetchMyIP((error, data) => {
+    if (error) {
+      console.log("IP lookup error:\n", error);
+      return;
+    }
+    console.log("IP: ", data);
+  
+    fetchGeoID(data, (error2, data2) =>{
+      if (error2) {
+        console.log("Geo coordinates lookup error:\n", error2);
+        return;
+      }
+      console.log("data: ", data2);
+  
+      flyoverTimes(data2, (error3, data3) => {
+        if (error3) {
+          console.log("ISS flyover time lookup error:\n", error3);
+          return;
+        }
+        callback(null, data3);
+      });
+    });
+  });
+}
 
 module.exports = {
   fetchMyIP,
   fetchGeoID,
-  flyoverTimes
+  flyoverTimes,
+  localTimes
 };
